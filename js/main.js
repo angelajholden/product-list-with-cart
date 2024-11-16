@@ -87,15 +87,15 @@ function addToCart(gridItem) {
 	// Append the new cart item to the sidebar
 	const cartSidebar = document.querySelector(".cart-container");
 	if (cartSidebar) {
-		console.log("cart item");
+		// console.log("cart item");
 		cartSidebar.appendChild(cartItem);
 	}
 
 	const cartButton = gridItem.querySelector(".cart-button");
 	const cartPlusMinus = gridItem.querySelector(".cart-plus-minus");
+	const gridItemQuantity = gridItem.querySelector(".item-quantity");
 	const dataGridItem = gridItem.getAttribute(`${itemName}`);
 	const dataCartItem = cartItem.getAttribute(`${itemName}`);
-	const gridItemQuantity = gridItem.querySelector(".item-quantity");
 	updateCartItemCount();
 
 	// Add functionality to remove the item from the cart
