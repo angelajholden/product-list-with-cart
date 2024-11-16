@@ -146,6 +146,13 @@ strong {
 	height: 0;
 	margin: 0;
 	padding-bottom: 100%;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 0 0 2px transparent;
+}
+
+.image-container:has(~ .cart-plus-minus.active) {
+	box-shadow: 0 0 0 2px var(--red);
 }
 
 @media (max-width: 600px) {
@@ -159,7 +166,6 @@ strong {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	border-radius: 10px;
 }
 
 .button-container {
@@ -204,29 +210,6 @@ strong {
 	display: flex;
 }
 
-.more-less {
-	appearance: none;
-	border: none;
-	background: none;
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: center;
-	align-items: center;
-	width: 18px;
-	height: 18px;
-	border: 1px solid var(--white);
-	border-radius: 50%;
-}
-
-.more-less svg {
-	display: block;
-	width: 10px;
-	height: 10px;
-	fill: var(--white);
-}
-
 .item-category {
 	font-size: 0.9rem;
 	color: var(--rose500);
@@ -254,12 +237,47 @@ strong {
 	left: 50%;
 	color: var(--white);
 	transform: translateX(-50%);
-	cursor: pointer;
 	z-index: 2;
 }
 
 .cart-plus-minus.active {
 	display: flex;
+}
+
+.more-less {
+	appearance: none;
+	border: none;
+	background: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: center;
+	width: 18px;
+	height: 18px;
+	border: 1px solid var(--white);
+	border-radius: 50%;
+	cursor: pointer;
+	transition: all 300ms ease-in-out;
+}
+
+.more-less svg {
+	display: block;
+	width: 10px;
+	height: 10px;
+	fill: var(--white);
+	transition: all 300ms ease-in-out;
+}
+
+.more-less:hover,
+.more-less:active,
+.more-less:focus {
+	background-color: var(--white);
+
+	& svg {
+		fill: var(--red);
+	}
 }
 
 /* Sidebar Cart Starts Here */
@@ -269,17 +287,25 @@ strong {
 	border-radius: 10px;
 }
 
+/* full cart is hidden on page load because the cart is empty */
 .full-cart {
+	display: none;
+}
+
+/* full cart is displayed when the cart is active and has items */
+.full-cart:has(.cart-container > .cart-item) {
 	display: block;
 }
 
+/* empty cart is displayed on page load because the cart is empty */
 .empty-cart {
 	display: block;
 	margin: 0 auto;
 	text-align: center;
 }
 
-.full-cart + .empty-cart {
+/* when the cart is full and active, the empty cart is not displayed */
+.full-cart:has(.cart-container > .cart-item) + .empty-cart {
 	display: none;
 }
 
