@@ -60,6 +60,7 @@ function toggleButton() {
  */
 function addToCart(gridItem) {
 	// Get item details from gridItem
+	const itemPhoto = gridItem.querySelector(".image-container img").src;
 	const itemName = gridItem.querySelector(".tertiary-header").innerText;
 	const itemPrice = parseFloat(gridItem.querySelector(".item-price").innerText.replace("$", ""));
 	let currentQuantity = 1;
@@ -84,11 +85,30 @@ function addToCart(gridItem) {
     </button>
   `;
 
+	// Create the new cart popover item markup
+	const cartItemPopover = document.createElement("article");
+	cartItemPopover.classList.add("cart-item-popover");
+	cartItemPopover.setAttribute("data-label", `${itemName}`);
+	cartItemPopover.innerHTML = `
+	<figure class="image-container">
+		<img src="${itemPhoto}" alt="${itemName}" />
+	</figure>
+	<div class="cart-quantity">
+      <p class="cart-heading">${itemName}</p>
+      <div class="quantity-wrap">
+		<span class="quantity">${currentQuantity}x</span>
+        <span class="each-item">@ $${itemPrice.toFixed(2)}</span>
+      </div>
+    </div>
+	<div class="item-total">$${itemPrice.toFixed(2)}</div>
+  `;
+
 	// Append the new cart item to the sidebar
 	const cartSidebar = document.querySelector(".cart-container");
+	const cartPopover = document.querySelector(".cart-popover");
 	if (cartSidebar) {
-		// console.log("cart item");
 		cartSidebar.appendChild(cartItem);
+		cartPopover.appendChild(cartItemPopover);
 	}
 
 	const cartButton = gridItem.querySelector(".cart-button");
@@ -102,8 +122,12 @@ function addToCart(gridItem) {
 	const removeButton = cartItem.querySelector(".remove-item");
 	const itemQuantitySpan = cartItem.querySelector(".quantity");
 	const itemTotalSpan = cartItem.querySelector(".item-total");
+	const itemQuantitySpanPopover = cartItemPopover.querySelector(".quantity");
+	const itemTotalSpanPopover = cartItemPopover.querySelector(".item-total");
+
 	removeButton.addEventListener("click", () => {
 		cartSidebar.removeChild(cartItem);
+		cartPopover.removeChild(cartItemPopover);
 		updateCartItemCount();
 
 		if (dataGridItem == dataCartItem) {
@@ -121,6 +145,8 @@ function addToCart(gridItem) {
 		currentQuantity++;
 		itemQuantitySpan.innerText = `${currentQuantity}x`;
 		itemTotalSpan.innerText = `$${(itemPrice * currentQuantity).toFixed(2)}`;
+		itemQuantitySpanPopover.innerText = `${currentQuantity}x`;
+		itemTotalSpanPopover.innerText = `$${(itemPrice * currentQuantity).toFixed(2)}`;
 		updateCartItemCount();
 	});
 
@@ -129,6 +155,8 @@ function addToCart(gridItem) {
 			currentQuantity--;
 			itemQuantitySpan.innerText = `${currentQuantity}x`;
 			itemTotalSpan.innerText = `$${(itemPrice * currentQuantity).toFixed(2)}`;
+			itemQuantitySpanPopover.innerText = `${currentQuantity}x`;
+			itemTotalSpanPopover.innerText = `$${(itemPrice * currentQuantity).toFixed(2)}`;
 			updateCartItemCount();
 		}
 	});
@@ -173,6 +201,7 @@ function updateCartItemCount() {
 	const cartItems = document.querySelectorAll(".cart-item");
 	const cartCountElement = document.querySelector(".cart-count");
 	const cartTotalAmount = document.querySelector(".total-amount");
+	const cartTotalAmountPopover = document.querySelector(".total-amount-popover");
 	let totalQuantity = 0;
 	let totalAmount = 0;
 
@@ -192,7 +221,41 @@ function updateCartItemCount() {
 
 	if (cartTotalAmount) {
 		cartTotalAmount.innerHTML = `$${totalAmount.toFixed(2)}`;
+		cartTotalAmountPopover.innerHTML = `$${totalAmount.toFixed(2)}`;
 	}
+}
+
+function clearCart() {
+	const clearCartButton = document.getElementById("clear-cart");
+
+	clearCartButton.addEventListener("click", () => {
+		// Select the cart items at the time of the click event
+		const cartItems = document.querySelectorAll(".cart-item");
+		const cartItemPopovers = document.querySelectorAll(".cart-item-popover");
+		console.log(cartItems.length);
+
+		// Loop through all cart items and remove them
+		if (cartItems.length >= 1) {
+			cartItems.forEach((item) => item.remove());
+			cartItemPopovers.forEach((item) => item.remove());
+		}
+
+		// Reset grid items
+		const gridItems = document.querySelectorAll(".grid-item");
+		gridItems.forEach((gridItem) => {
+			const cartButton = gridItem.querySelector(".cart-button");
+			const cartPlusMinus = gridItem.querySelector(".cart-plus-minus");
+			const gridItemQuantity = gridItem.querySelector(".item-quantity");
+
+			// Reset button classes and quantity
+			cartButton.classList.add("active");
+			cartPlusMinus.classList.remove("active");
+			gridItemQuantity.innerHTML = 1;
+		});
+
+		// Update the cart item count and total amount after clearing
+		updateCartItemCount();
+	});
 }
 
 // DON'T FORGET ABOUT PERSISTENT STORAGE
@@ -250,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			toggleButton();
 			setupCartPlusMinus();
 			updateCartItemCount();
+			clearCart();
 		})
 		.catch((error) => {
 			console.error("Error loading JSON data: ", error);
